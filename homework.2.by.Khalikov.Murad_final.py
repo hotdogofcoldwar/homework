@@ -8,116 +8,133 @@ import sys
 import random
 
 if sys.version_info[0] == 2:
-    input_function = raw_input
+    input_func = raw_input
 else:
-    input_function = input
+    input_func = input
 
-print(u'''            Игра Пятнашки на заданном размере игрового поля.
+print('''
+          ~~~~~~~~~~~~Game of 15 on desired field size~~~~~~~~~~~~
 
-            Для победы необходимо расставить все фишки по порядку,
-            пустая ячейка должна при этом находиться внизу справа.
+              For victory one should sort the tiles in order
+              from the top left corner to right line by line
+            Empty tile should be placed in lower right corner.
 
-            Для движения пустой ячейки используются клавиши w,a,s,d.
-            w - двигает пустую ячейку вверх,
-            s - двигает ее вниз,
-            a - движение влево,
-            d - движение вправо
-
+                    To move empty tile use keys: w,a,s,d.
+                     w - moves the empty tile up,
+                     s - moves the empty tile down,
+                     a - moves the empty tile left,
+                     d - moves the empty tile right
             ''')
 
-# input field size
+#  rules and input field size:
 while True:
     try:
-        row_number = input_function(u'Введите желаемое количество столбцов игрового поля в Пятнашках  ')
-        line_number = input_function(u'Введите желаемое количество рядов игрового поля в Пятнашках  ')
-        field = random.sample(range(int(row_number) * int(line_number)),int(row_number) * int(line_number)) # creates random field list
+        row_number = int(input_func('Enter the number of rows on field  '))
+        line_number = int(input_func('Enter the number of lines on field  '))
+
+        # creates random field list:
+        field = random.sample(range(row_number * line_number),
+                              row_number * line_number)
         break
     except ValueError:
-        print(u'Вы ввели не то, что нужно! Попробуйте целые числа ')
+        print('Integer number, please! ')
 
-empty_mark='empty'
+empty_mark = 'empty'
+count = 0
 
-# substitutes 0 to 'empty'
-b=int(field.index(0))
+
+# substitutes 0 to 'empty':
+b = int(field.index(0))
 field.pop(b)
-field.insert(b,empty_mark)
+field.insert(b, empty_mark)
 
-#victory condition
-victory=list(range(1,int(line_number)*int(row_number),1))
+
+# victory condition:
+victory = list(range(1, line_number * row_number, 1))
 victory.append(empty_mark)
 
-#functional block
+
+# functional block:
 def show_field():
-    # show current game field pattern
+    # show current game field pattern - divides list in row and lines
     i = 0
-    while i < int(line_number):
+    while i < line_number:
         i += 1
-        print(field[(i - 1)*int(row_number):(i * int(row_number))])
+        print(field[(i - 1) * row_number:(i * row_number)])
+
 
 def turn_w():
-    # w turn pattern
+    # w (up) turn pattern
     try:
-        global b
-        if b - int(row_number) >= 0:
-            field[b], field[b - int(row_number)] = field[b - int(row_number)], field[b]
-            b=b-int(row_number)
+        global b, count
+        if b - row_number >= 0:
+            field[b], field[b - row_number] = field[b - row_number], field[b]
+            b -= row_number
+            count += 1
             show_field()
         else:
-            print(u'''Вы не можете совершить данный ход
-            ''')
+            print('''You can't move the tile this direction
+                  ''')
     except IndexError:
-        print(u''' Вы нажали не ту клавишу
-         ''')
+        print(''' You have pressed wrong key
+              ''')
+
 
 def turn_s():
-    # s turn pattern
+    # s (down) turn pattern
     try:
-        global b
-        if int(b)+int(row_number) <= int(row_number) * int(line_number)-1:
-            field[b], field[b+int(row_number)]=field [b + int(row_number)], field[b]
-            b = b + int(row_number)
+        global b, count
+        if b + row_number <= row_number * line_number - 1:
+            field[b], field[b + row_number] = field[b + row_number], field[b]
+            b += row_number
+            count += 1
             show_field()
         else:
-            print(u'''Вы не можете совершить данный ход
-             ''')
+            print('''You can't move the tile this direction
+                  ''')
     except IndexError:
-        print(u'''
-        Вы нажали не ту клавишу ''')
+        print(''' You have pressed wrong key
+              ''')
+
 
 def turn_a():
-    # a turn pattern
+    # a (left) turn pattern
     try:
-        global b
-        if int(b) % (int(row_number)) > 0:
+        global b, count
+        if b % row_number > 0:
             field[b], field[b - 1] = field[b - 1], field[b]
-            b= b - 1
+            b -= 1
+            count += 1
             show_field()
         else:
-            print(u''' Вы не можете совершить данный ход
-             ''')
+            print('''You can't move the tile this direction
+                  ''')
     except IndexError:
-        print(u''' Вы нажали не ту клавишу
-         ''')
+        print(''' You have pressed wrong key
+               ''')
+
 
 def turn_d():
-    # d turn pattern
+    # d (right) turn pattern
     try:
-        global b
-        if (b + 1) % int(row_number) > 0:
-            field[b], field[b+1] = field[b+1], field[b]
-            b = b + 1
+        global b, count
+        if (b + 1) % row_number > 0:
+            field[b], field[b + 1] = field[b + 1], field[b]
+            b += 1
+            count += 1
             show_field()
         else:
-            print(u''' Вы не можете совершить данный ход
-             ''')
+            print('''You can't move the tile this direction
+                  ''')
     except IndexError:
-        print(u''' Вы нажали не ту клавишу
-         ''')
+        print(''' You have pressed wrong key
+              ''')
+
 
 def turn_input():
     # enter your turn pattern
-    turn = str(input_function(u''' Введите ваш ход! (w s a d)
-    '''))
+    turn = str(input_func(''' Enter your turn! (w s a d)
+                             '''))
     if turn == str('w'):
         turn_w()
     elif turn == str('a'):
@@ -127,13 +144,16 @@ def turn_input():
     elif turn == str('d'):
         turn_d()
     else:
-        print(u''' Вы нажали не ту клавишу
+        print(''' You have pressed wrong key
         ''')
+
 
 show_field()
 
-while field != victory: #game cycle
+# game cycle
+while field != victory:
     turn_input()
 
-print(u'''
-      Ура, победа!''')
+print(' You are victorious! The number of your turns - ', count)
+
+input_func()
